@@ -5,7 +5,7 @@ WIFI Thermometer für Brauerei
 
 - WEMOS D1 Mini
 - DS18B20 Temperatursensor
-- Widerstand 4,7 Kiloohm
+- Widerstand 4,7 KOhm
 - ggf. USB-Kabel und USB-Steckernetzteil ( hat wohl jeder heute ws rum liegen )
 
 Sieht kompliziert aus, ist es aber gar nicht ....
@@ -29,19 +29,19 @@ IThermometer gem. Schaltplan.jpg verdrahten
 
 - Zwei mal Reset am WEMOS drücken, dazwischen ein zwei Sekunden Pause lassen.
 - WEMOS spannt ein eigenes WLAN-Netzwerk auf, die LED am WEMOS leuchtet durchgehend.
-- Mit geignetem Gerät mit dem WLAN des WEMOS verbinden ( z.B. Handy, Tablet, Laptop.... )
-- Browser an dem verbunden Gerät öfnnen.
+- Mit geeignetem Gerät mit dem WLAN des WEMOS verbinden ( z.B. Handy, Tablet, Laptop.... )
+- Browser an dem verbunden Gerät öffnen.
 - Wenn die Config-Seite nicht automatisch öffnet im Browser die Adresse 192.168.4.1 eingeben
-- Auf Config clicken und die WLAN-Daten eingeben -anschliessend "SAVE" drücken
-- Der WEMOS prüft jetzt, ob die Eingaben stimmen, verbindet sich mit dem angegebenen WLAN-Metzwerk.
+- Auf Config clicken und die WLAN-Daten eingeben - anschliessend "SAVE" drücken
+- Der WEMOS prüft jetzt, ob die Eingaben stimmen, verbindet sich mit dem angegebenen WLAN-Netzwerk.
 
 ## Verhalten:
 
-Der WEMOS sendet jetz im 5 Sekundentakt UDP-Nachrichten auf dem eingegeben Port durchs Netzwerk. 
+Der WEMOS sendet jetzt im 5 Sekundentakt UDP-Nachrichten auf dem eingegeben Port durchs Netzwerk. 
 
 ## Bedienung in der Brauerei:
 
-- In der Brauerei Themperaturmessung "Arduino" wählen.
+- In der Brauerei Temperaturmessung "Arduino" wählen.
 - Auf dem Arduino Reiter "LAN/WLAN" wählen und den passenden "Port-IN" wählen
 - "Port-Out", "IP-Out" und "Sensortyp" spielen für das iThermometer keine Rolle. 
 

@@ -1,6 +1,11 @@
 # IThermometer
 WIFI Thermometer für Brauerei
 
+## Danksagung:
+Ein großes Dankeschön soll an dieser Stelle an universam gehen, der mit seine ISpindel
+praktisch eine fast fertige Vorlage für meinen Thermometer geliefert hat.
+https://github.com/universam1/iSpindel
+
 ## Bauteileliste:
 
 - WEMOS D1 Mini

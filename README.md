@@ -2,7 +2,7 @@
 WIFI Thermometer für Brauerei
 
 
-# Installation:
+## Installation:
 
 Sieht kompliziert aus, ist es aber gar nicht ....
 
@@ -17,9 +17,9 @@ IThermometer gem. Schaltplan.jpg verdrahten
 - COM-Port des WEMOS auswählen
 - Flashen
 
-# Der IThermometer ist fertig !
+### Der IThermometer ist fertig !
 
-# Bedienung:
+## Bedienung:
 
 - Zwei mal Reset am WEMOS drücken, dazwischen ein zwei Sekunden Pause lassen.
 - WEMOS spannt ein eigenes WLAN-Netzwerk auf, die LED am WEMOS leuchtet durchgehend.
@@ -29,17 +29,17 @@ IThermometer gem. Schaltplan.jpg verdrahten
 - Auf Config clicken und die WLAN-Daten eingeben -anschliessend "SAVE" drücken
 - Der WEMOS prüft jetzt, ob die Eingaben stimmen, verbindet sich mit dem angegebenen WLAN-Metzwerk.
 
-# Verhalten:
+## Verhalten:
 
 Der WEMOS sendet jetz im 5 Sekundentakt UDP-Nachrichten auf dem eingegeben Port durchs Netzwerk. 
 
-# Bedienung in der Brauerei:
+## Bedienung in der Brauerei:
 
 - In der Brauerei Themperaturmessung "Arduino" wählen.
 - Auf dem Arduino Reiter "LAN/WLAN" wählen und den passenden "Port-IN" wählen
 - "Port-Out", "IP-Out" und "Sensortyp" spielen für das iThermometer keine Rolle. 
 
-# Abschluss:
+## Abschluss:
 
 Fertig, die Brauerei sollte jetzt die Temperatur anzeigen.
 Diese Prozedur ist nur einmal nötig. Die Einstellungen bleiben in der Brauerei und im WEMOS erhalten.

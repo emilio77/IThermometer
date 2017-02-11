@@ -6,7 +6,7 @@ WIFI Thermometer für Brauerei
 - WEMOS D1 Mini
 - DS18B20 Temperatursensor
 - Widerstand 4,7 KOhm
-- ggf. USB-Kabel und USB-Steckernetzteil ( hat wohl jeder heute ws rum liegen )
+- ggf. USB-Kabel und USB-Steckernetzteil ( hat wohl jeder heute was rum zu liegen )
 
 Sieht kompliziert aus, ist es aber gar nicht ....
 

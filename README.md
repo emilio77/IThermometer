@@ -3,7 +3,7 @@ WIFI Thermometer für Brauerei
 
 ## Danksagung:
 Ein großes Dankeschön soll an dieser Stelle an universam gehen, der mit seine ISpindel
-praktisch eine fast fertige Vorlage für meinen Thermometer geliefert hat.
+praktisch eine fast fertige Vorlage für meinen Thermometer geliefert hat.  
 https://github.com/universam1/iSpindel
 
 ## Bauteileliste:
@@ -16,7 +16,7 @@ https://github.com/universam1/iSpindel
 Sieht kompliziert aus, ist es aber gar nicht ....
 
 IThermometer gem. Schaltplan.jpg verdrahten
-![Schaltpln](Schaltplan.jpg)
+![Schaltplan](Schaltplan.jpg)
 
 ## Installation:
 
@@ -58,3 +58,11 @@ Will man die Einstellungen ändern, 2x mit kurzem Abstand Reset am WEMOS drücke
 Die USB-Verbindung ist ebenfalls nicht mehr nötig. Der WEMOS kann mit einem beliebigen Handy-USB-Ladegerät 
 mit Spannung versorgt werden.
 Die Datenübertragung erfolgt kabellos per WLAN.
+
+## Zusatzoptionen
+- ich hab für den WEMOS ein recht passendes Gehäuse bei Ebay gefunden  
+  [>Link<](http://www.ebay.de/itm/401126237744?_trksid=p2060353.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT "Link zum Gehäuseanbieter bei Ebay")  
+- Wer etwas mehr löten mag kann auf den WEMOS noch ein OLED aufstecken und bekommt damit die Temperatur auc direkt angezeigt.  
+  [>Link<](http://www.ebay.de/itm/WeMos-D1-mini-WiFi-OLED-0-66-I2C-TFT-Modul-ESP8266-NodeMcu-LUA-/291999752242?hash=item43fc8aa032:g:cRAAAOSwjDZYeWj1 "Link zum OLED-Anbieter bei Ebay")  
+  ![OLED](OLED.jpg)
+  

@@ -7,11 +7,10 @@
 #include <WiFiManager.h>                             //https://github.com/kentaylor/WiFiManager
 #include <DoubleResetDetector.h>                     //https://github.com/datacute/DoubleResetDetector
 #include <OneWire.h>                                 //http://www.pjrc.com/teensy/td_libs_OneWire.html
-#include "DallasTemperature.h"
 #include <Adafruit_GFX.h>                            //https://github.com/adafruit/Adafruit-GFX-Library
-#include <Adafruit_SSD1306.h>                        //https://github.com/adafruit/Adafruit_SSD1306
+#include <Adafruit_SSD1306.h>                        //https://github.com/mcauser/Adafruit_SSD1306
 
-#define Version "2.1.0"
+#define Version "2.1.1"
 
 #define deltaMeldungMillis 5000                      // Sendeintervall an die Brauerei in Millisekunden
 #define DRD_TIMEOUT 10                               // Number of seconds after reset during which a subseqent reset will be considered a double reset.
@@ -30,8 +29,6 @@ unsigned int answerPort = 5003;                       // Port auf den Temperatur
 WiFiUDP Udp;
 
 OneWire ds(D3);                                       // OneWire an pin D3
-DallasTemperature DS18B20(&ds);
-DeviceAddress tempDeviceAddress;
 
 const int PIN_LED = 2;                                // Controls the onboard LED.
 bool initialConfig = false;                           // Indicates whether ESP has WiFi credentials saved from previous session, or double reset detected
@@ -73,36 +70,36 @@ void USBOut()
   Serial.println();
 }
 
-void initDS18B20() {
-  DS18B20.begin();                                               // Start up the DS18B20
-  DS18B20.setWaitForConversion(false);
-  DS18B20.getAddress(tempDeviceAddress, 0);
-  DS18B20.setResolution(tempDeviceAddress, RESOLUTION);
-  requestTemp();
-}
-
-float getTemperature(bool block = false) {
-  float t = Temp;                                                 // we need to wait for DS18b20 to finish conversion
-  while (block && (millis() - DSreqTime <= OWinterval))           // if we need the result we have to block
-    yield();
-  if (millis() - DSreqTime > OWinterval) {
-    t = DS18B20.getTempCByIndex(0);
-    DSrequested = false;
-    if (t == DEVICE_DISCONNECTED_C ||                             // DISCONNECTED
-        t == 85.0)                                                // we read 85 uninitialized
-    {
-      Serial.println(F("ERROR: OW DISCONNECTED"));
-    }
+float DS18B20lesen()
+{
+  int HighByte, LowByte, TReading, SignBit, Tc_100, Whole, Fract;
+  byte i;
+  byte present = 0;
+  byte data[12];
+  byte addr[8];
+  if ( !ds.search(addr))  { ds.search(addr); } // Wenn keine weitere Adresse vorhanden, von vorne anfangen
+  ds.reset();
+  ds.select(addr);
+  ds.write(0x44, 1);        // start Konvertierung, mit power-on am Ende
+  delay(750);               // 750ms sollten ausreichen
+  present = ds.reset();
+  ds.select(addr);
+  ds.write(0xBE);           // Wert lesen
+  for ( i = 0; i < 9; i++) { data[i] = ds.read(); }
+  LowByte = data[0];
+  HighByte = data[1];
+  TReading = (HighByte << 8) + LowByte;
+  SignBit = TReading & 0x8000;  // test most sig bit
+  if (SignBit)                  // negative
+  {
+    TReading = (TReading ^ 0xffff) + 1; // 2's comp
   }
-  return t;
-}
-
-void requestTemp() {
-  if (DSrequested == false) {
-    DS18B20.requestTemperatures();
-    DSreqTime = millis();
-    DSrequested = true;
+  Temp = TReading * 0.0625;       // Für DS18S20  temperatur = TReading*0.5
+  if (SignBit) // negative Werte ermitteln
+  {
+    Temp = Temp * -1;
   }
+  return Temp;
 }
 
 void ReadSettings() {
@@ -131,6 +128,8 @@ void setup() {
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3C (for the 64x48)
   display.display();
 
+  WiFi.mode(WIFI_STA); // Force to station mode because if device was switched off while in access point mode it will start up next time in access point mode.
+  WiFi.setOutputPower(20.5);
   WiFi.setAutoConnect(true);
   WiFi.setAutoReconnect(true);
 
@@ -157,10 +156,9 @@ void setup() {
     WiFiManagerParameter p_answerPort("answerPort", "send temperature on UDP Port", convertedValue, 5);
 
     WiFiManager wifiManager;
+    wifiManager.setBreakAfterConfig(true);
     wifiManager.addParameter(&p_answerPort);
     wifiManager.setConfigPortalTimeout(300);
-
-    wifiManager.setBreakAfterConfig(true);
 
     if (!wifiManager.startConfigPortal()) {
       Serial.println("Not connected to WiFi but continuing anyway.");
@@ -172,13 +170,14 @@ void setup() {
     answerPort = atoi(p_answerPort.getValue());
 
     WriteSettings();
- 
-    digitalWrite(PIN_LED, HIGH); // Turn led off as we are not in configuration mode.
+
+    WiFi.setAutoConnect(true);
+    WiFi.setAutoReconnect(true);
 
   }
    
   digitalWrite(PIN_LED, HIGH); // Turn led off as we are not in configuration mode.
-  WiFi.mode(WIFI_STA); // Force to station mode because if device was switched off while in access point mode it will start up next time in access point mode.
+  
   unsigned long startedAt = millis();
   Serial.print("After waiting ");
   int connRes = WiFi.waitForConnectResult();
@@ -207,12 +206,12 @@ void loop() {
   if (WiFi.status()!=WL_CONNECTED){
     WiFi.reconnect();
     Serial.println("lost connection");
+    delay(5000);
   } else{
     if(!deltaMeldungMillis == 0 && jetztMillis - letzteMeldungMillis > deltaMeldungMillis)
     {
       digitalWrite(PIN_LED, LOW);
-      initDS18B20();
-      Temp = getTemperature(true);
+      Temp = DS18B20lesen();
       UDPOut();
       USBOut();  
       DisplayOut();

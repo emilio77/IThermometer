@@ -61,7 +61,7 @@ mit Spannung versorgt werden.
 Die Datenübertragung erfolgt kabellos per WLAN.
 
 ## Zusatzoptionen:
-- Ich hab für den WEMOS ein recht passendes Gehäuse bei Ebay gefunden. Da passt der WEMOS inkl. des USB-Steckers rein. Auf der anderen seite kommt dann der DS18B20 rein. Noch zweil löcher rein gebohrt, damit man an den Reset-Button des WEMOS kommt und eins damit man das blinkende LED sieht, WEMOS mit doppelseitigem Klebeband rein geklebt... fertig.  
+- Ich hab für den WEMOS ein recht passendes Gehäuse bei Ebay gefunden. Da passt der WEMOS inkl. des USB-Steckers rein. Auf der anderen Seite kommt dann der DS18B20 raus. Noch zwei Löcher rein gebohrt, eins damit man an den Reset-Button des WEMOS kommt und eins damit man das blinkende LED sieht, WEMOS mit doppelseitigem Klebeband rein geklebt... fertig.  
   [>Link<](http://www.ebay.de/itm/401126237744?_trksid=p2060353.m2749.l2649&ssPageName=STRK%3AMEBIDX%3AIT "Link zum Gehäuseanbieter bei Ebay")  
 - Wer etwas mehr löten mag kann auf den WEMOS noch ein OLED aufstecken und bekommt damit die Temperatur auch direkt angezeigt. Aber vorsicht, damit passt das Gehäuse natürlich nicht mehr.  
   [>Link<](http://www.ebay.de/itm/WeMos-D1-mini-WiFi-OLED-0-66-I2C-TFT-Modul-ESP8266-NodeMcu-LUA-/291999752242?hash=item43fc8aa032:g:cRAAAOSwjDZYeWj1 "Link zum OLED-Anbieter bei Ebay")  

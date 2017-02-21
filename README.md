@@ -22,7 +22,7 @@ IThermometer gem. Schaltplan.jpg verdrahten
 ## Installation:
 
 - IThermometer am USB-Port anschließen
-- ESP8266Flasher.exe öffnen
+- ESP8266Flasher.exe **mit Adminrechten** öffnen ( Rechtsclick - Als Administrator ausführen )
 - Auf Config Reiter wechseln
 - IThermometer.bin öffnen ( Erstes Zahnrädchen )
 - Auf Operation Reiter wechseln

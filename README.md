@@ -2,7 +2,7 @@
 WIFI Thermometer für Brauerei
 
 ## Danksagung:
-Ein großes Dankeschön soll an dieser Stelle an universam gehen, der mit seine ISpindel
+Ein großes Dankeschön soll an dieser Stelle an universam gehen, der mit seiner ISpindel
 praktisch eine fast fertige Vorlage für meinen Thermometer geliefert hat.  
 https://github.com/universam1/iSpindel  
 Ebenfalls Danke möchte ich glassart sagen, der mich immer kräftig beim Testen unterstützt.

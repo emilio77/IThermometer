@@ -10,7 +10,7 @@
 #include <Adafruit_GFX.h>                            //https://github.com/adafruit/Adafruit-GFX-Library
 #include <Adafruit_SSD1306.h>                        //https://github.com/mcauser/Adafruit_SSD1306
 
-#define Version "2.1.1"
+#define Version "2.1.2"
 
 #define deltaMeldungMillis 5000                      // Sendeintervall an die Brauerei in Millisekunden
 #define DRD_TIMEOUT 10                               // Number of seconds after reset during which a subseqent reset will be considered a double reset.
@@ -32,11 +32,9 @@ OneWire ds(D3);                                       // OneWire an pin D3
 
 const int PIN_LED = 2;                                // Controls the onboard LED.
 bool initialConfig = false;                           // Indicates whether ESP has WiFi credentials saved from previous session, or double reset detected
-float Temp = 0.0;
 char charVal[8];
 unsigned long jetztMillis = 0, letzteUDPMillis = 0, letzteMeldungMillis = 0;
-unsigned long DSreqTime;
-bool DSrequested = false;
+float Temp = 0.0;
 
 void DisplayOut() {
   dtostrf(Temp, 3, 1, charVal);
@@ -54,7 +52,8 @@ void DisplayOut() {
 void UDPOut() {
   dtostrf(Temp, 3, 1, charVal);
   Udp.beginPacket(UDPip, answerPort);
-  Udp.write('T');
+  Udp.write('T');  
+  if (Temp<10) {Udp.write(' ');}
   Udp.write(charVal);
   Udp.write('t');
   Udp.println();
@@ -72,33 +71,22 @@ void USBOut()
 
 float DS18B20lesen()
 {
-  int HighByte, LowByte, TReading, SignBit, Tc_100, Whole, Fract;
-  byte i;
-  byte present = 0;
-  byte data[12];
-  byte addr[8];
-  if ( !ds.search(addr))  { ds.search(addr); } // Wenn keine weitere Adresse vorhanden, von vorne anfangen
+  int TReading, SignBit;
+  byte i, present = 0, data[12], addr[8];
+  if ( !ds.search(addr))  { ds.search(addr); }        // Wenn keine weitere Adresse vorhanden, von vorne anfangen
   ds.reset();
   ds.select(addr);
-  ds.write(0x44, 1);        // start Konvertierung, mit power-on am Ende
-  delay(750);               // 750ms sollten ausreichen
+  ds.write(0x44, 1);                                  // start Konvertierung, mit power-on am Ende
+  delay(750);                                         // 750ms sollten ausreichen
   present = ds.reset();
   ds.select(addr);
-  ds.write(0xBE);           // Wert lesen
+  ds.write(0xBE);                                     // Wert lesen
   for ( i = 0; i < 9; i++) { data[i] = ds.read(); }
-  LowByte = data[0];
-  HighByte = data[1];
-  TReading = (HighByte << 8) + LowByte;
-  SignBit = TReading & 0x8000;  // test most sig bit
-  if (SignBit)                  // negative
-  {
-    TReading = (TReading ^ 0xffff) + 1; // 2's comp
-  }
-  Temp = TReading * 0.0625;       // Für DS18S20  temperatur = TReading*0.5
-  if (SignBit) // negative Werte ermitteln
-  {
-    Temp = Temp * -1;
-  }
+  TReading = (data[1] << 8) + data[0];
+  SignBit = TReading & 0x8000;                        // test most sig bit
+  if (SignBit) {TReading = (TReading ^ 0xffff) + 1;}  // 2's comp
+  Temp = TReading * 0.0625;                           // Für DS18S20  temperatur = TReading*0.5
+  if (SignBit) {Temp = Temp * -1;}
   return Temp;
 }
 

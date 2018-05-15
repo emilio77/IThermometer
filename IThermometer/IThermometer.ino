@@ -5,12 +5,13 @@
 #include <ESP8266WiFi.h>                             //https://github.com/esp8266/Arduino
 #include <EEPROM.h>                                  
 #include <WiFiManager.h>                             //https://github.com/kentaylor/WiFiManager
+#include <ESP8266WebServer.h>                        //http://www.wemos.cc/tutorial/get_started_in_arduino.html
 #include <DoubleResetDetector.h>                     //https://github.com/datacute/DoubleResetDetector
 #include <OneWire.h>                                 //http://www.pjrc.com/teensy/td_libs_OneWire.html
 #include <Adafruit_GFX.h>                            //https://github.com/adafruit/Adafruit-GFX-Library
 #include <Adafruit_SSD1306.h>                        //https://github.com/mcauser/Adafruit_SSD1306
 
-#define Version "2.1.2"
+#define Version "2.1.3"
 
 #define deltaMeldungMillis 5000                      // Sendeintervall an die Brauerei in Millisekunden
 #define DRD_TIMEOUT 10                               // Number of seconds after reset during which a subseqent reset will be considered a double reset.
@@ -26,6 +27,8 @@ DoubleResetDetector drd(DRD_TIMEOUT, DRD_ADDRESS);
 
 IPAddress UDPip(192,168,178,255);                     // IP-Adresse an welche UDP-Nachrichten geschickt werden xx.xx.xx.255 = Alle Netzwerkteilnehmer die am Port horchen.
 unsigned int answerPort = 5003;                       // Port auf den Temperaturen geschickt werden
+unsigned int localPort = 5010;                        // Port auf dem gelesen wird
+ESP8266WebServer server(80);                          // Webserver initialisieren auf Port 80
 WiFiUDP Udp;
 
 OneWire ds(D3);                                       // OneWire an pin D3
@@ -35,6 +38,47 @@ bool initialConfig = false;                           // Indicates whether ESP h
 char charVal[8];
 unsigned long jetztMillis = 0, letzteUDPMillis = 0, letzteMeldungMillis = 0;
 float Temp = 0.0;
+
+void Hauptseite()
+{
+  char dummy[8];
+  String Antwort = "";
+  Antwort += "<meta http-equiv='refresh' content='5'/>";
+  Antwort += "<font face=";
+  Antwort += char(34);
+  Antwort += "Courier New";
+  Antwort += char(34);
+  Antwort += ">";
+   
+  Antwort += "<b>Aktuelle Temperatur: </b>\n</br>";
+  
+  dtostrf(Temp, 5, 1, dummy);  
+  Antwort += dummy;
+  Antwort += " ";
+  Antwort += char(176);
+  Antwort += "C\n</br>";
+
+  Antwort +="</br>Verbunden mit: ";
+  Antwort +=WiFi.SSID(); 
+  Antwort +="</br>Signalstaerke: ";
+  Antwort +=WiFi.RSSI(); 
+  Antwort +="dBm  </br>";
+  Antwort +="</br>IP-Adresse: ";
+  IPAddress IP = WiFi.localIP();
+  Antwort += IP[0];
+  Antwort += ".";
+  Antwort += IP[1];
+  Antwort += ".";
+  Antwort += IP[2];
+  Antwort += ".";
+  Antwort += IP[3];
+  Antwort +="</br>";
+  Antwort +="</br>UDP-OUT port: ";
+  Antwort +=answerPort; 
+  Antwort +="</br></br>";
+  Antwort += "</font>";
+  server.send ( 300, "text/html", Antwort );
+}
 
 void DisplayOut() {
   dtostrf(Temp, 3, 1, charVal);
@@ -173,6 +217,7 @@ void setup() {
   Serial.print(waited/1000);
   Serial.print(" secs in setup() connection result is ");
   Serial.println(connRes);
+ 
   if (WiFi.status()!=WL_CONNECTED){
     Serial.println("failed to connect, finishing setup anyway");
   } else{
@@ -183,6 +228,29 @@ void setup() {
     Serial.print("UDP-Port: ");
     Serial.println(answerPort); 
   }
+   if (WiFi.status()!=WL_CONNECTED){
+    Serial.println("failed to connect, finishing setup anyway");
+  } else{
+    UDPip=WiFi.localIP();
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(0,0);
+    display.println("IP-Adresse");    
+    display.println("----------");
+    display.print(UDPip[0]);
+    display.print(".");
+    display.print(UDPip[1]);
+    display.println(".");
+    display.print(UDPip[2]);
+    display.print(".");
+    display.print(UDPip[3]);
+    display.display();
+    delay(8000);  
+    server.on("/", Hauptseite);
+    server.begin();                          // HTTP-Server starten
+  }
+
 }
 
 void loop() {
@@ -190,6 +258,8 @@ void loop() {
   drd.loop();
   
   jetztMillis = millis();
+
+  server.handleClient(); // auf HTTP-Anfragen warten
   
   if (WiFi.status()!=WL_CONNECTED){
     WiFi.reconnect();
@@ -203,6 +273,7 @@ void loop() {
       UDPOut();
       USBOut();  
       DisplayOut();
+      Hauptseite();
       letzteMeldungMillis = jetztMillis;
       digitalWrite(PIN_LED, HIGH);
     }

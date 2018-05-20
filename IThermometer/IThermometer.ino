@@ -11,7 +11,7 @@
 #include <Adafruit_GFX.h>                            //https://github.com/adafruit/Adafruit-GFX-Library
 #include <Adafruit_SSD1306.h>                        //https://github.com/mcauser/Adafruit_SSD1306
 
-#define Version "2.1.3"
+#define Version "2.1.4"
 
 #define deltaMeldungMillis 5000                      // Sendeintervall an die Brauerei in Millisekunden
 #define DRD_TIMEOUT 10                               // Number of seconds after reset during which a subseqent reset will be considered a double reset.
@@ -27,7 +27,6 @@ DoubleResetDetector drd(DRD_TIMEOUT, DRD_ADDRESS);
 
 IPAddress UDPip(192,168,178,255);                     // IP-Adresse an welche UDP-Nachrichten geschickt werden xx.xx.xx.255 = Alle Netzwerkteilnehmer die am Port horchen.
 unsigned int answerPort = 5003;                       // Port auf den Temperaturen geschickt werden
-unsigned int localPort = 5010;                        // Port auf dem gelesen wird
 ESP8266WebServer server(80);                          // Webserver initialisieren auf Port 80
 WiFiUDP Udp;
 
@@ -224,13 +223,8 @@ void setup() {
     Serial.print("local ip: ");
     Serial.println(WiFi.localIP());
     UDPip=WiFi.localIP();
-    UDPip[3]=255;
     Serial.print("UDP-Port: ");
     Serial.println(answerPort); 
-  }
-   if (WiFi.status()!=WL_CONNECTED){
-    Serial.println("failed to connect, finishing setup anyway");
-  } else{
     UDPip=WiFi.localIP();
     display.clearDisplay();
     display.setTextSize(1);
@@ -247,6 +241,7 @@ void setup() {
     display.print(UDPip[3]);
     display.display();
     delay(8000);  
+    UDPip[3]=255;
     server.on("/", Hauptseite);
     server.begin();                          // HTTP-Server starten
   }
@@ -258,7 +253,7 @@ void loop() {
   drd.loop();
   
   jetztMillis = millis();
-
+  
   server.handleClient(); // auf HTTP-Anfragen warten
   
   if (WiFi.status()!=WL_CONNECTED){

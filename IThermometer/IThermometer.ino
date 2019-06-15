@@ -10,6 +10,7 @@
 #include <OneWire.h>                                 //http://www.pjrc.com/teensy/td_libs_OneWire.html
 #include <Adafruit_GFX.h>                            //https://github.com/adafruit/Adafruit-GFX-Library
 #include <Adafruit_SSD1306.h>                        //https://github.com/mcauser/Adafruit_SSD1306
+#include <ESP8266HTTPClient.h>
 
 #define Version "2.1.4"
 
@@ -101,6 +102,41 @@ void UDPOut() {
   Udp.write('t');
   Udp.println();
   Udp.endPacket();
+}
+
+void HTTPOut(){
+  if(WiFi.status()== WL_CONNECTED){   //Check WiFi connection status
+    dtostrf(Temp, 3, 1, charVal);
+    HTTPClient http;   
+    String httpURL = String("http://192.168.0.112:5000/api/httpsensor/1/") + charVal ; 
+    // Next Steps: IP and KEY should be configurable by WebInterface
+    http.begin(httpURL);  //Specify destination for HTTP request
+    http.addHeader("Content-Type", "text/plain");             //Specify content-type header
+  
+    int httpResponseCode = http.GET();   //Send the actual POST request
+  
+    if(httpResponseCode>0){
+  
+      String response = http.getString();                       //Get the response to the request
+  
+      Serial.println(httpResponseCode);   //Print return code
+      Serial.println(response);           //Print request answer
+  
+    }else{
+  
+      Serial.print("Error on sending POST: ");
+      Serial.println(httpResponseCode);
+  
+    }
+  
+    http.end();  //Free resources
+  
+  }else{
+  
+      Serial.println("Error in WiFi connection");   
+ 
+ }
+
 }
 
 void USBOut()
@@ -265,7 +301,8 @@ void loop() {
     {
       digitalWrite(PIN_LED, LOW);
       Temp = DS18B20lesen();
-      UDPOut();
+//      UDPOut();
+      HTTPOut();
       USBOut();  
       DisplayOut();
       Hauptseite();
